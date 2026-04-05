@@ -11,22 +11,59 @@ import {
   Stack,
   Grid
 } from "@mui/material";
-import fetchModel, { API_BASE_URL } from "../../lib/fetchModelData";
+import fetchModel, { API_BASE_URLS } from "../../lib/fetchModelData";
 
 function formatDate(dateString) {
   return new Date(dateString).toLocaleString();
 }
 
-function getPhotoSrc(photo) {
+function getPhotoCandidates(photo) {
+  const candidates = [];
+
   if (photo.url?.startsWith("http://") || photo.url?.startsWith("https://")) {
-    return photo.url;
+    candidates.push(photo.url);
   }
 
   if (photo.url) {
-    return `${API_BASE_URL}${photo.url}`;
+    API_BASE_URLS.forEach((baseUrl) => {
+      candidates.push(`${baseUrl}${photo.url}`);
+    });
   }
 
-  return `${API_BASE_URL}/images/${photo.file_name}`;
+  if (photo.file_name) {
+    API_BASE_URLS.forEach((baseUrl) => {
+      candidates.push(`${baseUrl}/images/${photo.file_name}`);
+    });
+  }
+
+  return [...new Set(candidates)];
+}
+
+function PhotoCardImage({ photo }) {
+  const candidates = getPhotoCandidates(photo);
+  const [srcIndex, setSrcIndex] = useState(0);
+
+  useEffect(() => {
+    setSrcIndex(0);
+  }, [photo._id]);
+
+  if (!candidates.length) {
+    return null;
+  }
+
+  return (
+    <CardMedia
+      component="img"
+      image={candidates[srcIndex]}
+      alt="User photo"
+      sx={{ width: "100%", objectFit: "cover" }}
+      onError={() => {
+        if (srcIndex < candidates.length - 1) {
+          setSrcIndex((current) => current + 1);
+        }
+      }}
+    />
+  );
 }
 
 function UserPhotos() {
@@ -57,12 +94,7 @@ function UserPhotos() {
       {photos.map((photo) => (
         <Grid item xs={12} md={6} key={photo._id}>
           <Card sx={{ mb: 3 }}>
-            <CardMedia
-              component="img"
-              image={getPhotoSrc(photo)}
-              alt="User photo"
-              sx={{ width: "100%", objectFit: "cover" }}
-            />
+            <PhotoCardImage photo={photo} />
             <CardContent>
               <Typography variant="body2" color="text.secondary">
                 Created: {formatDate(photo.date_time)}
