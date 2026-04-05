@@ -5,7 +5,8 @@
  *
  */
 export const API_BASE_URLS = [
-  "http://localhost:3001"
+  "http://localhost:3001",
+  "https://flxp3f-3001.csb.app",
 ];
 
 export function buildApiUrl(baseUrl, url) {
