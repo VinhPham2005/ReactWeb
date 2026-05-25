@@ -9,7 +9,7 @@ import {
   Divider,
   Avatar,
   Stack,
-  Grid
+  Grid,
 } from "@mui/material";
 import fetchModel, { API_BASE_URLS } from "../../lib/fetchModelData";
 
@@ -73,7 +73,7 @@ function UserPhotos() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchModel(`/photosOfUser/${userId}`)
+    fetchModel(`/photo/${userId}`)
       .then((data) => {
         setPhotos(data);
         setLoading(false);
@@ -102,7 +102,12 @@ function UserPhotos() {
               <Divider sx={{ my: 1 }} />
               {photo.comments && photo.comments.length > 0 ? (
                 photo.comments.map((c) => (
-                  <Stack direction="row" spacing={1} alignItems="center" key={c._id}>
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    alignItems="center"
+                    key={c._id}
+                  >
                     <Avatar
                       component={Link}
                       to={`/users/${c.user._id}`}

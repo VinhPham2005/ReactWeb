@@ -5,7 +5,7 @@ import {
   ListItem,
   ListItemText,
   Typography,
-  ListItemButton
+  ListItemButton,
 } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import fetchModel from "../../lib/fetchModelData";
@@ -50,11 +50,15 @@ function UserList() {
                     String(item._id) === currentUserId ? "#e3f2fd" : "inherit",
                   "&:hover": {
                     backgroundColor:
-                      String(item._id) === currentUserId ? "#bbdefb" : "#f5f5f5"
-                  }
+                      String(item._id) === currentUserId
+                        ? "#bbdefb"
+                        : "#f5f5f5",
+                  },
                 }}
               >
-                <ListItemText primary={`${item.first_name} ${item.last_name}`} />
+                <ListItemText
+                  primary={`${item.first_name} ${item.last_name}`}
+                />
               </ListItemButton>
             </ListItem>
             <Divider />

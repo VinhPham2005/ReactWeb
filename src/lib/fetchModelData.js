@@ -4,9 +4,7 @@
  * @param {string} url      The URL to issue the GET request.
  *
  */
-export const API_BASE_URLS = [
-  "http://localhost:3001"
-];
+export const API_BASE_URLS = ["https://54fstt-8081.csb.app/api", "http://localhost:8081/api"];
 
 export function buildApiUrl(baseUrl, url) {
   return `${baseUrl}${url}`;
