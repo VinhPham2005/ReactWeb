@@ -12,7 +12,6 @@ import {
   Grid,
 } from "@mui/material";
 import fetchModel, { API_BASE_URLS } from "../../lib/fetchModelData";
-import AddComment from "../AddComments";
 
 function formatDate(dateString) {
   return new Date(dateString).toLocaleString();
@@ -73,7 +72,7 @@ function UserPhotos() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchPhotosData = () => {
+  useEffect(() => {
     fetchModel(`/photo/${userId}`)
       .then((data) => {
         setPhotos(data);
@@ -84,11 +83,6 @@ function UserPhotos() {
         setError("Failed to load photos");
         setLoading(false);
       });
-  };
-
-  useEffect(() => {
-    setLoading(true);
-    fetchPhotosData();
   }, [userId]);
 
   if (loading) return <div>Loading photos...</div>;
@@ -137,11 +131,6 @@ function UserPhotos() {
               ) : (
                 <Typography variant="body2">No comments</Typography>
               )}
-
-              <AddComment 
-                photoId={photo._id} 
-                onCommentAdded={fetchPhotosData} 
-              />
             </CardContent>
           </Card>
         </Grid>
