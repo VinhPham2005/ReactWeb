@@ -59,7 +59,7 @@ const LoginRegister = ({ setCurrentUser }) => {
     try {
       console.log("2. Chuẩn bị gửi dữ liệu lên Backend:", regUser); // Trạm kiểm soát 2
       
-      const response = await axios.post("http://localhost:8081/api/user", {
+      const response = await postModel("/user", {
         login_name: regUser.login_name,
         password: regUser.password,
         first_name: regUser.first_name,

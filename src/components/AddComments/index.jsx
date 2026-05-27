@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Box, TextField, Button } from "@mui/material";
 import axios from "axios";
+import { postModel } from "../../lib/fetchModelData";
 
 function AddComment({ photoId, onCommentAdded }) {
   const [comment, setComment] = useState("");
@@ -13,7 +14,7 @@ function AddComment({ photoId, onCommentAdded }) {
     setIsSubmitting(true);
     try {
       // Gọi API POST mà bạn đã viết ở backend
-      await axios.post(`http://localhost:8081/api/photo/commentsOfPhoto/${photoId}`, {
+      await postModel(`/photo/commentsOfPhoto/${photoId}`, {
         comment: comment,
       });
       

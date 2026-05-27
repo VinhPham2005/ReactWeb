@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios"; // Để gửi file bằng FormData
+import { postModel } from "../../lib/fetchModelData"; // Hàm tiện ích để gọi API với base URL linh hoạt
 
 const TopBar = ({ currentUser, setCurrentUser }) => {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ const TopBar = ({ currentUser, setCurrentUser }) => {
 
     try {
       // Nhớ dùng đúng cổng Backend của bạn (ví dụ: 8081)
-      await axios.post("http://localhost:8081/api/photo/new", formData, {
+      await postModel("/photo/new", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
