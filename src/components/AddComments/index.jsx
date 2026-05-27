@@ -23,7 +23,7 @@ function AddComment({ photoId, onCommentAdded }) {
       console.error("Lỗi khi gửi comment:", error);
       alert("Không thể gửi bình luận. Vui lòng thử lại.");
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false); 
     }
   };
 
