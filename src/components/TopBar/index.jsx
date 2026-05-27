@@ -1,65 +1,102 @@
-import React, { useEffect, useState } from "react";
-import { AppBar, Toolbar, Typography, Box, Avatar } from "@mui/material";
-import { useLocation } from "react-router-dom";
-import fetchModel from "../../lib/fetchModelData";
-import "./styles.css";
+import React, { useRef, useState } from "react";
+import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import axios from "axios"; // Để gửi file bằng FormData
 
-function TopBar() {
-  const location = useLocation();
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+const TopBar = ({ currentUser, setCurrentUser }) => {
+  const navigate = useNavigate();
+  const fileInputRef = useRef(null);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const pathParts = location.pathname.split("/");
-  const userId = (pathParts[1] === "users" || pathParts[1] === "photos") ? pathParts[2] : null;
+  // Hàm xử lý Logout (Giữ nguyên của bạn)
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    setCurrentUser(null);
+    navigate("/login-register");
+  };
 
-  useEffect(() => {
-    if (userId) {
-      setLoading(true);
-      fetchModel(`/user/${userId}`)
-        .then((data) => {
-          setUser(data);
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.log(err);
-          setError("Failed to load user");
-          setLoading(false);
-        });
-    } else {
-      setUser(null);
+  // Mở cửa sổ chọn file khi bấm nút "Add Photo"
+  const handleAddPhotoClick = () => {
+    fileInputRef.current.click();
+  };
+
+  // Nhận file và gửi lên Backend
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    // Gửi file thì bắt buộc phải dùng FormData thay vì JSON thông thường
+    const formData = new FormData();
+    formData.append("photo", file); 
+
+    try {
+      // Nhớ dùng đúng cổng Backend của bạn (ví dụ: 8081)
+      await axios.post("http://localhost:8081/api/photo/new", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      alert("Tải ảnh lên thành công!");
+      
+      // Yêu cầu đề bài: Hiển thị ngay ảnh đó. 
+      // Chuyển hướng người dùng về đúng trang chứa ảnh của họ để xem
+      navigate(`/photos/${currentUser._id}`);
+      
+      // Mẹo: Reload nhẹ dữ liệu nếu họ đang đứng sẵn ở trang đó
+      window.location.reload(); 
+    } catch (err) {
+      console.error("Lỗi tải ảnh:", err);
+      alert("Tải ảnh thất bại. Vui lòng thử lại.");
+    } finally {
+      setIsUploading(false);
+      // Reset input để có thể up cùng 1 ảnh nhiều lần nếu muốn
+      e.target.value = null; 
     }
-  }, [userId]);
+  };
 
   return (
     <AppBar position="static">
       <Toolbar>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          Photo Sharing App
+          {currentUser ? `Hi, ${currentUser.first_name}` : "Photo Sharing App"}
         </Typography>
-        {loading && <Typography variant="body1">Loading user...</Typography>}
-        {error && <Typography variant="body1">{error}</Typography>}
-        {user && !loading && !error && (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Typography variant="body1">
-              {pathParts[1] === "photos"
-                ? `Photos of ${user.first_name} ${user.last_name}`
-                : `${user.first_name} ${user.last_name}`}
-            </Typography>
-            <Avatar
-              src={user.avatar   || undefined}
-              sx={{
-                bgcolor: user.avatar ? "transparent" : "#bdbdbd",
-                color: "#fff"
-              }}
+
+        {currentUser ? (
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+            
+            {/* 1. NÚT ADD PHOTO */}
+            <Button 
+              color="inherit" 
+              variant="outlined" 
+              onClick={handleAddPhotoClick}
+              disabled={isUploading}
             >
-              {!user.avatar && user.first_name[0]}
-            </Avatar>
+              {isUploading ? "Uploading..." : "Add Photo"}
+            </Button>
+            
+            {/* THẺ INPUT FILE BỊ ẨN */}
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              ref={fileInputRef}
+              onChange={handleFileChange}
+            />
+
+            {/* 2. NÚT LOGOUT */}
+            <Button color="inherit" onClick={handleLogout}>
+              Logout
+            </Button>
           </Box>
+        ) : (
+          <Typography variant="body1">Vui lòng đăng nhập</Typography>
         )}
       </Toolbar>
     </AppBar>
   );
-}
+};
 
 export default TopBar;
