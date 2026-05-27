@@ -7,7 +7,7 @@
 
 import axios from "axios";
 
-export const API_BASE_URLS = [ "http://localhost:8081/api"];
+export const API_BASE_URLS = ["https://7qyx49-8081.csb.app/api", "http://localhost:8081/api"];
 // "https://54fstt-8081.csb.app/api",
 axios.interceptors.request.use(
   (config) => {
